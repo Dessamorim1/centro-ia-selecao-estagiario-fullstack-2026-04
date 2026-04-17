@@ -74,18 +74,30 @@ Regras importantes:
 - Evite respostas genéricas
 - Use linguagem profissional
 
-Formato da resposta (OBRIGATÓRIO):
+FORMATO DE RESPOSTA (OBRIGATÓRIO):
 
-Responda em Markdown estruturado com títulos claros e inclua também um JSON ao final no seguinte formato:
+- Responda SOMENTE com JSON válido
+- NÃO use Markdown
+- NÃO use ```json
+- NÃO escreva texto antes ou depois
+- NÃO explique nada fora do JSON
+
+Regras adicionais:
+- "risco" deve ser exatamente: "baixo", "medio" ou "alto"
+- "score" deve ser um número inteiro
+- listas devem ser arrays válidos
+
+Formato final:
 
 {
-"risco": "baixo | medio | alto",
-"score": 0,
-"regime_tributario": "",
-"beneficios_fiscais": [],
-"pontos_fortes": [],
-"pontos_fracos": [],
-"resumo": ""
+  "risco": "baixo | medio | alto",
+  "score": 0,
+  "regime_tributario": "",
+  "beneficios_fiscais": [],
+  "pontos_fortes": [],
+  "pontos_fracos": [],
+  "resumo": ""
 }
+
 JSON para análise:
 {json_empresa}

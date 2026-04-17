@@ -1,15 +1,12 @@
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import declarative_base
-
-engine = create_engine("sqlite:///database/banco.db")
-
-Base = declarative_base()
+from sqlalchemy import Column, Integer, String
+from backend.models.database import Base
 
 class Empresa(Base):
     __tablename__ = "empresa"
 
     cnpj = Column(String, primary_key=True)
     quantidade = Column(Integer, default=0)
+    dados_cnpj = Column(String) 
 
 class EmpresaLog(Base):
     __tablename__ = "empresa_log"
@@ -19,6 +16,5 @@ class EmpresaLog(Base):
     data_consulta = Column(String)
     potencial = Column(String)
     risco = Column(String)
-    analise = Column(String)  
-
-Base.metadata.create_all(engine)
+    analise = Column(String)
+    analise_completa = Column(String)

@@ -3,10 +3,10 @@ import logging
 from fastapi import FastAPI
 from backend.routes.cnpja_routes import router_cnpj
 from backend.routes.ai_routes import router_ai
+from backend.routes.reanalize_routes import router_reanalisar
 
 from backend.models.database import engine
 from backend.models.models import Base
-
 
 Base.metadata.create_all(bind=engine)
 
@@ -25,6 +25,7 @@ app = FastAPI()
 
 app.include_router(router_cnpj)
 app.include_router(router_ai)
+app.include_router(router_reanalisar)
 
 @app.get("/")
 def home():
