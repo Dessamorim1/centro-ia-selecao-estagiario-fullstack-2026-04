@@ -2,29 +2,23 @@ import json
 from backend.services.ai_service import PROMPT_ANALISE, extrair_json
 from backend.clients.gemini_api.ai_connection import AIConnection
 from backend.clients.gemini_api.ai_client import AIClient
-
-def classificar_popularidade(qtd):
-    if qtd < 3:
-        return "baixa"
-    elif qtd < 10:
-        return "media"
-    else:
-        return "alta"
+from backend.utils.popularidade import classificar_popularidade
 
 async def reanalisar_com_contexto(dados, logs, quantidade):
     nivel_popularidade = classificar_popularidade(quantidade)
 
-    contexto = "\nContexto adicional:\n"
-    contexto += f"- Esta empresa foi consultada {quantidade} vezes.\n"
-    contexto += f"- Nível de interesse: {nivel_popularidade}.\n"
-    contexto += "- Use isso como indicador indireto, não determinante.\n"
+    contexto_partes = [
+    f"Esta empresa foi consultada {quantidade} vezes.",
+    f"Nível de interesse: {nivel_popularidade}.",
+    "Use como indicador indireto, não determinante."
+    ]
 
     if logs:
-        contexto += "\nAnálises anteriores:\n"
-        for log in logs:
-            contexto += f"- {log.analise}\n"
+        contexto_partes.append("Análises anteriores:")
+        contexto_partes.extend([log.analise for log in logs])
+        contexto_partes.append("Gere uma nova análise diferente das anteriores.")
 
-        contexto += "\nGere uma nova análise diferente das anteriores.\n"
+    contexto = "\n".join(contexto_partes)
 
     prompt = PROMPT_ANALISE.replace(
         "{json_empresa}",

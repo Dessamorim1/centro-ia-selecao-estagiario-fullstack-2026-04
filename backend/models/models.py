@@ -14,7 +14,7 @@ class EmpresaLog(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     cnpj = Column(String)
     data_consulta = Column(String)
-    potencial = Column(String)
+    pontos_fortes = Column(String)
     risco = Column(String)
     analise = Column(String)
     analise_completa = Column(String)

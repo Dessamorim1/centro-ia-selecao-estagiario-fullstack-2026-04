@@ -32,7 +32,9 @@ async def analisar_empresa(dados_empresa: dict):
 
     resposta = await client.analisar_empresa(prompt)
 
-    if isinstance(resposta, str):
-        return extrair_json(resposta)
-
-    return resposta
+    try:
+        if isinstance(resposta, str):
+            return extrair_json(resposta)
+        return resposta
+    except Exception as e:
+        raise Exception(f"Erro ao processar resposta da IA: {str(e)}")
