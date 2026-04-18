@@ -22,9 +22,7 @@ def extrair_json(resposta: str) -> dict:
 
     raise Exception("Não foi possível extrair JSON da IA")
 
-async def analisar_empresa(dados_empresa: dict):
-    conn = AIConnection()
-    client = AIClient(conn)
+async def analisar_empresa(dados_empresa: dict, client):
 
     json_formatado = json.dumps(dados_empresa, indent=2, ensure_ascii=False)
 

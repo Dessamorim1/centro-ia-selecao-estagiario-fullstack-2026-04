@@ -12,6 +12,8 @@ from backend.models.database import get_db
 from backend.models.models import Empresa, EmpresaLog
 from backend.services.ai_service import analisar_empresa
 from backend.services.cnpj_service import buscar_info_cnpj
+from backend.dependencies.ai import get_ai_client
+from backend.clients.gemini_api.ai_client import AIClient
 
 router_ai = APIRouter(
     prefix="/api/analisar_empresa",
@@ -21,12 +23,12 @@ router_ai = APIRouter(
 logger = logging.getLogger(__name__)
 
 @router_ai.post("/{cnpj}")
-async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db)):
+async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db), ai_client: AIClient = Depends(get_ai_client)):
     try:
         validar_cnpj(cnpj)
 
         dados = await buscar_info_cnpj(cnpj)
-        analise = await analisar_empresa(dados)
+        analise = await analisar_empresa(dados, ai_client)
 
         analise_json = json.dumps(analise, sort_keys=True)
 
@@ -34,7 +36,8 @@ async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db)):
 
         if empresa:
             empresa.quantidade += 1
-            empresa.dados_cnpj = json.dumps(dados)
+            if not empresa.dados_cnpj:
+                empresa.dados_cnpj = json.dumps(dados)
         else:
             empresa = Empresa(
                 cnpj=cnpj,
@@ -42,6 +45,7 @@ async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db)):
                 dados_cnpj=json.dumps(dados)
             )
             db.add(empresa)
+            db.flush() 
 
         quantidade = empresa.quantidade
         nivel = classificar_popularidade(quantidade)
@@ -54,6 +58,7 @@ async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db)):
         )
 
         if ultimo_log and ultimo_log.analise_completa == analise_json:
+            db.commit()
             return {
                 "cnpj": cnpj,
                 "fonte": "cache",
@@ -93,11 +98,14 @@ async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         logger.error(f"Erro ao analisar CNPJ {cnpj}: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(
+            status_code=400,
+            detail="Erro ao analisar empresa"
+        )
 
 
 @router_ai.post("/reanalisar/{cnpj}")
-async def reanalisar_com_historico(cnpj: str, db: Session = Depends(get_db)):
+async def reanalisar_com_historico(cnpj: str, db: Session = Depends(get_db), ai_client: AIClient = Depends(get_ai_client)):
     try:
         validar_cnpj(cnpj)
 
@@ -119,7 +127,7 @@ async def reanalisar_com_historico(cnpj: str, db: Session = Depends(get_db)):
         quantidade = empresa.quantidade
 
         analise, nivel = await reanalisar_com_contexto(
-            dados, logs, quantidade
+            dados, logs, quantidade, ai_client
         )
 
         return {
@@ -135,6 +143,8 @@ async def reanalisar_com_historico(cnpj: str, db: Session = Depends(get_db)):
         }
 
     except Exception as e:
-        db.rollback()
         logger.error(f"Erro ao reanalisar CNPJ {cnpj}: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(
+            status_code=400,
+            detail="Erro ao reanalisar empresa"
+        )
