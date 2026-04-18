@@ -35,6 +35,15 @@ export default function Resultado() {
       try {
         setErro(null);
         setLoading(true);
+        
+        const cache = sessionStorage.getItem(`empresa_${cnpj}_${tipo}`);
+
+        if (cache) {
+          console.log("USANDO CACHE");
+          setEmpresa(JSON.parse(cache));
+          setLoading(false);
+          return;
+        }
 
         let data;
 
@@ -58,6 +67,12 @@ export default function Resultado() {
         if (!ativo) return;
 
         const empresaFormatada = adaptarEmpresa(data);
+
+        sessionStorage.setItem(
+          `empresa_${cnpj}_${tipo}`,
+          JSON.stringify(empresaFormatada)
+        );
+
         setEmpresa(empresaFormatada);
       } catch (err) {
         if (!ativo) return;
@@ -81,9 +96,7 @@ export default function Resultado() {
   if (erro) {
     return (
       <div className="container mt-5">
-        <div className="alert alert-danger">
-          {erro}
-        </div>
+        <div className="alert alert-danger">{erro}</div>
       </div>
     );
   }
@@ -103,13 +116,7 @@ export default function Resultado() {
 
       <button
         className="btn btn-outline-secondary mb-3"
-        onClick={() => {
-          if (window.history.length > 1) {
-            router.back();
-          } else {
-            router.push("/");
-          }
-        }}
+        onClick={() => router.push("/")}
       >
         ← Voltar
       </button>
@@ -125,11 +132,16 @@ export default function Resultado() {
       {empresa.meta?.popularidade && (
         <button
           className="btn btn-info mt-3"
-          onClick={() =>
+          onClick={() => {
+            sessionStorage.setItem(
+              `empresa_${cnpj}_${tipo}`,
+              JSON.stringify(empresa)
+            );
+
             router.push(
               `/insights?consultas=${empresa.meta.popularidade.consultas}&nivel=${empresa.meta.popularidade.nivel}`
-            )
-          }
+            );
+          }}
         >
           Ver Insights
         </button>

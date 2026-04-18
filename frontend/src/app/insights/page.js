@@ -33,9 +33,9 @@ export default function Insights() {
 
       <button
         className="btn btn-outline-secondary mb-3"
-        onClick={() => router.push("/")}
+        onClick={() => router.back()}
       >
-        ← Voltar para início
+        ← Voltar
       </button>
 
       <h2>Insights de Popularidade</h2>
