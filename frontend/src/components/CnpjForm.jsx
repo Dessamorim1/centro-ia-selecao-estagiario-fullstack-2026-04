@@ -23,7 +23,10 @@ export default function CnpjForm({ onSubmit }) {
   };
 
   return (
-    <form>
+    <div className="card p-4">
+
+      <h4 className="mb-3">Consulta de Empresa</h4>
+
       <div className="mb-3">
         <label className="form-label">CNPJ</label>
         <input
@@ -35,21 +38,40 @@ export default function CnpjForm({ onSubmit }) {
         />
       </div>
 
+      <div className="mb-4">
+
+        <div className="mb-3 p-3 border rounded">
+          <strong>Análise Normal</strong>
+          <p className="mb-0 text-muted">
+            Retorna dados públicos da empresa, como nome, status, endereço e atividade.
+          </p>
+        </div>
+
+        <div className="mb-3 p-3 border rounded">
+          <strong> Análise com IA</strong>
+          <p className="mb-0 text-muted">
+            Gera uma análise inteligente com resumo da empresa, nível de risco e pontos fortes,
+            além de métricas de popularidade.
+          </p>
+        </div>
+
+      </div>
+
       <div className="d-flex gap-2">
         <button
-          className="btn btn-primary"
+          className="btn btn-primary w-100"
           onClick={(e) => handleSubmit(e, "normal")}
         >
-          Análise Normal
+          Analisar Dados
         </button>
 
         <button
-          className="btn btn-dark"
+          className="btn btn-dark w-100"
           onClick={(e) => handleSubmit(e, "ia")}
         >
-          Análise com IA
+          Analisar com IA
         </button>
       </div>
-    </form>
+    </div>
   );
 }

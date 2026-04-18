@@ -62,6 +62,7 @@ async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db), ai_cli
             return {
                 "cnpj": cnpj,
                 "fonte": "cache",
+                "dados": dados, 
                 "analise": analise,
                 "meta": {
                     "popularidade": {
@@ -86,6 +87,7 @@ async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db), ai_cli
         return {
             "cnpj": cnpj,
             "fonte": "nova",
+            "dados": dados, 
             "analise": analise,
             "meta": {
                 "popularidade": {
@@ -94,7 +96,7 @@ async def analisar_empresa_rota(cnpj: str, db: Session = Depends(get_db), ai_cli
                 }
             }
         }
-
+    
     except Exception as e:
         db.rollback()
         logger.error(f"Erro ao analisar CNPJ {cnpj}: {str(e)}")

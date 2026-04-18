@@ -34,11 +34,22 @@ export default function Resultado() {
         setErro(null);
         setLoading(true);
 
-        const data =
-          tipo === "ia"
-            ? await analisarCNPJComIA(cnpj)
-            : await analisarCNPJ(cnpj);
+        let data;
 
+        if (tipo === "ia") {
+          const [dados, ia] = await Promise.all([
+            analisarCNPJ(cnpj),         
+            analisarCNPJComIA(cnpj),    
+          ]);
+
+          data = {
+            ...dados,
+            analise: ia.analise,
+            meta: ia.meta,
+          };
+        } else {
+          data = await analisarCNPJ(cnpj);
+        }
         const empresaFormatada = adaptarEmpresa(data);
 
         setEmpresa(empresaFormatada);
@@ -79,6 +90,12 @@ export default function Resultado() {
 
   return (
     <div className="container mt-5">
+      <h5 className="mb-3">
+        {empresa.tipo === "ia"
+          ? "Resultado da Análise com IA"
+          : "Dados retornados da Empresa"}
+      </h5>
+
       <EmpresaCard empresa={empresa} />
 
       {empresa.meta?.popularidade && (
