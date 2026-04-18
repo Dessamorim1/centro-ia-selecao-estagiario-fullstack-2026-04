@@ -29,6 +29,8 @@ export default function Resultado() {
   const [erro, setErro] = useState(null);
 
   useEffect(() => {
+    let ativo = true;
+
     async function fetchData() {
       try {
         setErro(null);
@@ -38,9 +40,11 @@ export default function Resultado() {
 
         if (tipo === "ia") {
           const [dados, ia] = await Promise.all([
-            analisarCNPJ(cnpj),         
-            analisarCNPJComIA(cnpj),    
+            analisarCNPJ(cnpj),
+            analisarCNPJComIA(cnpj),
           ]);
+
+          if (!ativo) return;
 
           data = {
             ...dados,
@@ -50,18 +54,26 @@ export default function Resultado() {
         } else {
           data = await analisarCNPJ(cnpj);
         }
-        const empresaFormatada = adaptarEmpresa(data);
 
+        if (!ativo) return;
+
+        const empresaFormatada = adaptarEmpresa(data);
         setEmpresa(empresaFormatada);
       } catch (err) {
+        if (!ativo) return;
+
         console.error(err);
         setErro(err.message);
       } finally {
-        setLoading(false);
+        if (ativo) setLoading(false);
       }
     }
 
     fetchData();
+
+    return () => {
+      ativo = false;
+    };
   }, [cnpj, tipo]);
 
   if (loading) return <LoadingSpinner />;
@@ -70,9 +82,7 @@ export default function Resultado() {
     return (
       <div className="container mt-5">
         <div className="alert alert-danger">
-          <div className="alert alert-danger">
-            {erro}
-          </div>
+          {erro}
         </div>
       </div>
     );
@@ -90,6 +100,20 @@ export default function Resultado() {
 
   return (
     <div className="container mt-5">
+
+      <button
+        className="btn btn-outline-secondary mb-3"
+        onClick={() => {
+          if (window.history.length > 1) {
+            router.back();
+          } else {
+            router.push("/");
+          }
+        }}
+      >
+        ← Voltar
+      </button>
+
       <h5 className="mb-3">
         {empresa.tipo === "ia"
           ? "Resultado da Análise com IA"

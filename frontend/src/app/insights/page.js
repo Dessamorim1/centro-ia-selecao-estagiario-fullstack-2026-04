@@ -1,9 +1,10 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function Insights() {
   const params = useSearchParams();
+  const router = useRouter();
 
   const consultas = Number(params.get("consultas")) || 0;
   const nivel = params.get("nivel") || "Desconhecido";
@@ -29,10 +30,17 @@ export default function Insights() {
 
   return (
     <div className="container mt-5">
+
+      <button
+        className="btn btn-outline-secondary mb-3"
+        onClick={() => router.push("/")}
+      >
+        ← Voltar para início
+      </button>
+
       <h2>Insights de Popularidade</h2>
 
       <div className="card p-4 mt-4">
-
         <p>
           <strong>Consultas:</strong> {consultas}
         </p>
@@ -43,9 +51,8 @@ export default function Insights() {
 
         <hr />
 
-        <h5>Insight gerado </h5>
+        <h5>Insight gerado</h5>
         <p>{gerarInsight()}</p>
-
       </div>
     </div>
   );
