@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+python-dotenv
+requests
+httpx
+pydantic
+python-multipart
+google-genai
+validate-docbr
